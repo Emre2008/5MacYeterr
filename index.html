@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>TipsPro AI - VIP Analiz Paneli</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f1f5f9; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; }
+        h1 { text-align: center; color: #38bdf8; letter-spacing: 2px; border-bottom: 2px solid #1e293b; padding-bottom: 15px; margin-bottom: 25px; }
+        .match-card { background: #1e293b; border-radius: 15px; padding: 20px; margin-bottom: 20px; cursor: pointer; border: 2px solid #334155; position: relative; transition: 0.3s; }
+        .match-card:hover { border-color: #38bdf8; transform: scale(1.01); }
+        .league-tag { font-size: 0.7rem; background: #0ea5e9; color: #fff; padding: 4px 12px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
+        .match-time { float: right; font-size: 0.85rem; color: #94a3b8; }
+        .avg-goal-tag { background: #f59e0b; color: #000; padding: 2px 10px; border-radius: 10px; font-weight: bold; font-size: 0.75rem; margin-left: 10px; }
+        
+        .teams-row { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0; font-size: 1.4rem; font-weight: bold; padding: 0 10px; }
+        .vs { color: #38bdf8; font-size: 1rem; }
+
+        /* Form Gösterimi */
+        .form-container { display: flex; justify-content: space-between; padding: 0 10px 15px 10px; margin-bottom: 5px; border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
+        .form-dots { display: flex; gap: 4px; }
+        .dot { width: 16px; height: 16px; border-radius: 4px; font-size: 9px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .G { background: #22c55e; } .B { background: #64748b; } .M { background: #ef4444; }
+
+        .analysis-panel { display: none; background: #0f172a; border-radius: 12px; padding: 15px; margin-top: 15px; border: 1px solid #38bdf8; cursor: default; }
+        .h2h-title { color: #38bdf8; font-weight: bold; font-size: 1rem; margin-bottom: 12px; display: block; }
+        .h2h-table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 8px; overflow: hidden; margin-bottom: 15px; }
+        .h2h-table td { padding: 8px 12px; border-bottom: 1px solid #0f172a; font-size: 0.85rem; color: #cbd5e1; }
+        .goal-tag { background: #0ea5e9; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; float: right; }
+        
+        /* Skor Tahmin Kutusu */
+        .score-predict { background: #0c111d; border: 1px dashed #f59e0b; border-radius: 8px; padding: 10px; margin-bottom: 15px; display: flex; justify-content: space-around; align-items: center; }
+        .predict-item { text-align: center; }
+        .predict-label { font-size: 0.65rem; color: #f59e0b; text-transform: uppercase; font-weight: bold; display: block; }
+        .predict-val { font-size: 1.1rem; font-weight: bold; color: #fff; }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .stat-item { background: #1e293b; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid #334155; }
+        .stat-label { display: block; color: #94a3b8; font-size: 0.8rem; margin-bottom: 5px; }
+        .val { display: block; color: #22c55e; font-weight: bold; font-size: 1.1rem; }
+
+        .ai-verdict { background: #1e3a8a; padding: 15px; border-radius: 10px; font-size: 0.85rem; line-height: 1.6; border-left: 5px solid #38bdf8; }
+        .banko-label { color: #38bdf8; font-weight: bold; display: block; margin-top: 10px; text-transform: uppercase; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🤖 TipsPro AI VIP</h1>
+
+    <div class="match-card" onclick="toggle('m1')">
+        <span class="league-tag">SÜPER LİG</span><span class="avg-goal-tag">GOL ORT: 3.42</span>
+        <span class="match-time">05.04 | 20:00</span>
+        <div class="teams-row"><span>Fenerbahçe</span><span class="vs">VS</span><span>Beşiktaş</span></div>
+        <div class="form-container">
+            <div class="form-dots"><div class="dot G">G</div><div class="dot B">B</div><div class="dot G">G</div><div class="dot B">B</div><div class="dot G">G</div></div>
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot M">M</div><div class="dot G">G</div></div>
+        </div>
+        <div id="m1" class="analysis-panel" onclick="event.stopPropagation()">
+            <div class="score-predict">
+                <div class="predict-item"><span class="predict-label">İY Tahmini</span><span class="predict-val">1 - 1</span></div>
+                <div class="predict-item"><span class="predict-label">MS Tahmini</span><span class="predict-val">2 - 2</span></div>
+            </div>
+            <span class="h2h-title">Aralarındaki Son 5 Maç</span>
+            <table class="h2h-table">
+                <tr><td>23.12.25</td><td>FB - BJK</td><td>1 - 2</td><td><span class="goal-tag">3 Gol</span></td></tr>
+                <tr><td>02.11.25</td><td>BJK - FB</td><td>2 - 3</td><td><span class="goal-tag">5 Gol</span></td></tr>
+                <tr><td>04.05.25</td><td>FB - BJK</td><td>0 - 1</td><td><span class="goal-tag">1 Gol</span></td></tr>
+                <tr><td>07.12.24</td><td>BJK - FB</td><td>1 - 0</td><td><span class="goal-tag">1 Gol</span></td></tr>
+                <tr><td>27.04.24</td><td>FB - BJK</td><td>2 - 1</td><td><span class="goal-tag">3 Gol</span></td></tr>
+            </table>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">2.5 Üst</span><span class="val">%62</span></div>
+                <div class="stat-item"><span class="stat-label">KG Var</span><span class="val">%77</span></div>
+            </div>
+            <div class="ai-verdict">Kadıköy'deki yüksek pres gücü ve her iki takımın da skor üretme iştahı gollü bir derbi vaat ediyor. <span class="banko-label">🎯 TAVSİYE: KG VAR & 2.5 ÜST</span></div>
+        </div>
+    </div>
+
+    <div class="match-card" onclick="toggle('m2')">
+        <span class="league-tag">SÜPER LİG</span><span class="avg-goal-tag">GOL ORT: 2.18</span>
+        <span class="match-time">04.04 | 19:00</span>
+        <div class="teams-row"><span>Trabzonspor</span><span class="vs">VS</span><span>Galatasaray</span></div>
+        <div class="form-container">
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div></div>
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot M">M</div><div class="dot G">G</div></div>
+        </div>
+        <div id="m2" class="analysis-panel" onclick="event.stopPropagation()">
+            <div class="score-predict">
+                <div class="predict-item"><span class="predict-label">İY Tahmini</span><span class="predict-val">0 - 1</span></div>
+                <div class="predict-item"><span class="predict-label">MS Tahmini</span><span class="predict-val">0 - 2</span></div>
+            </div>
+            <span class="h2h-title">Aralarındaki Son 5 Maç</span>
+            <table class="h2h-table">
+                <tr><td>05.01.26</td><td>GS - TS</td><td>4 - 1</td><td><span class="goal-tag">5 Gol</span></td></tr>
+                <tr><td>01.11.25</td><td>GS - TS</td><td>0 - 0</td><td><span class="goal-tag">0 Gol</span></td></tr>
+                <tr><td>14.05.25</td><td>GS - TS</td><td>3 - 0</td><td><span class="goal-tag">3 Gol</span></td></tr>
+                <tr><td>10.05.25</td><td>TS - GS</td><td>0 - 2</td><td><span class="goal-tag">2 Gol</span></td></tr>
+                <tr><td>16.12.24</td><td>GS - TS</td><td>4 - 3</td><td><span class="goal-tag">7 Gol</span></td></tr>
+            </table>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">MS 2</span><span class="val">%75</span></div>
+                <div class="stat-item"><span class="stat-label">KG Yok</span><span class="val">%67</span></div>
+            </div>
+            <div class="ai-verdict">GS'nin elit savunma bloğu ve Trabzon'un aşırı performansının "normalleşme" eğilimi MS 2 ihtimalini güçlendiriyor.<span class="banko-label">🎯 TAVSİYE: MS 2</span></div>
+        </div>
+    </div>
+
+    <div class="match-card" onclick="toggle('m3')">
+        <span class="league-tag">SÜPER LİG</span><span class="avg-goal-tag">GOL ORT: 3.19</span>
+        <span class="match-time">05.04 | 17:00</span>
+        <div class="teams-row"><span>Antalyaspor</span><span class="vs">VS</span><span>Eyüpspor</span></div>
+        <div class="form-container">
+            <div class="form-dots"><div class="dot B">B</div><div class="dot M">M</div><div class="dot M">M</div><div class="dot G">G</div><div class="dot M">M</div></div>
+            <div class="form-dots"><div class="dot M">M</div><div class="dot M">M</div><div class="dot M">M</div><div class="dot B">B</div><div class="dot G">G</div></div>
+        </div>
+        <div id="m3" class="analysis-panel" onclick="event.stopPropagation()">
+            <div class="score-predict">
+                <div class="predict-item"><span class="predict-label">İY Tahmini</span><span class="predict-val">1 - 0</span></div>
+                <div class="predict-item"><span class="predict-label">MS Tahmini</span><span class="predict-val">2 - 1</span></div>
+            </div>
+            <span class="h2h-title">Aralarındaki Son 5 Maç</span>
+            <table class="h2h-table">
+                <tr><td>03.11.25</td><td>EYÜP - ANT</td><td>0 - 1</td><td><span class="goal-tag">1 Gol</span></td></tr>
+                <tr><td>24.05.25</td><td>EYÜP - ANT</td><td>2 - 1</td><td><span class="goal-tag">3 Gol</span></td></tr>
+                <tr><td>04.01.25</td><td>ANT - EYÜP</td><td>1 - 4</td><td><span class="goal-tag">5 Gol</span></td></tr>
+                <tr><td>17.12.19</td><td>ANT - EYÜP</td><td>2 - 2</td><td><span class="goal-tag">4 Gol</span></td></tr>
+                <tr><td>04.12.19</td><td>EYÜP - ANT</td><td>0 - 3</td><td><span class="goal-tag">3 Gol</span></td></tr>
+            </table>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">KG Var (Ev)</span><span class="val">%92</span></div>
+                <div class="stat-item"><span class="stat-label">1.5 Üst (Ev)</span><span class="val">%100</span></div>
+            </div>
+            <div class="ai-verdict">Antalyaspor'un evindeki gol istikrarı (%100 1.5 Üst), Eyüpspor'un savunma hatalarıyla birleşiyor. <span class="banko-label">🎯 TAVSİYE: 1.5 ÜST</span></div>
+        </div>
+    </div>
+
+    <div class="match-card" onclick="toggle('m4')">
+        <span class="league-tag">LIGUE 1</span><span class="avg-goal-tag">GOL ORT: 3.52</span>
+        <span class="match-time">03.04 | 21:45</span>
+        <div class="teams-row"><span>PSG</span><span class="vs">VS</span><span>Toulouse</span></div>
+        <div class="form-container">
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot B">B</div><div class="dot M">M</div></div>
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot M">M</div><div class="dot M">M</div><div class="dot B">B</div></div>
+        </div>
+        <div id="m4" class="analysis-panel" onclick="event.stopPropagation()">
+            <div class="score-predict">
+                <div class="predict-item"><span class="predict-label">İY Tahmini</span><span class="predict-val">2 - 0</span></div>
+                <div class="predict-item"><span class="predict-label">MS Tahmini</span><span class="predict-val">4 - 0</span></div>
+            </div>
+            <span class="h2h-title">Aralarındaki Son 5 Maç</span>
+            <table class="h2h-table">
+                <tr><td>30.08.25</td><td>TOU - PSG</td><td>3 - 6</td><td><span class="goal-tag">9 Gol</span></td></tr>
+                <tr><td>15.02.25</td><td>TOU - PSG</td><td>0 - 1</td><td><span class="goal-tag">1 Gol</span></td></tr>
+                <tr><td>22.11.24</td><td>PSG - TOU</td><td>3 - 0</td><td><span class="goal-tag">3 Gol</span></td></tr>
+                <tr><td>12.05.24</td><td>PSG - TOU</td><td>1 - 3</td><td><span class="goal-tag">4 Gol</span></td></tr>
+                <tr><td>03.01.24</td><td>PSG - TOU</td><td>2 - 0</td><td><span class="goal-tag">2 Gol</span></td></tr>
+            </table>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">MS 1 (İç)</span><span class="val">%83</span></div>
+                <div class="stat-item"><span class="stat-label">KG Yok (İç)</span><span class="val">%75</span></div>
+            </div>
+            <div class="ai-verdict">PSG evinde 45 maçtır atıyor. Agresif Toulouse savunması PSG karşısında dağılacaktır. <span class="banko-label">🎯 TAVSİYE: MS 1 & 2.5 ÜST</span></div>
+        </div>
+    </div>
+
+    <div class="match-card" onclick="toggle('m5')">
+        <span class="league-tag">PRO LEAGUE</span><span class="avg-goal-tag">GOL ORT: 4.12</span>
+        <span class="match-time">03.04 | 21:00</span>
+        <div class="teams-row"><span>Al Nassr</span><span class="vs">VS</span><span>Al Najma</span></div>
+        <div class="form-container">
+            <div class="form-dots"><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div><div class="dot G">G</div></div>
+            <div class="form-dots"><div class="dot M">M</div><div class="dot M">M</div><div class="dot M">M</div><div class="dot M">M</div><div class="dot G">G</div></div>
+        </div>
+        <div id="m5" class="analysis-panel" onclick="event.stopPropagation()">
+            <div class="score-predict">
+                <div class="predict-item"><span class="predict-label">İY Tahmini</span><span class="predict-val">3 - 0</span></div>
+                <div class="predict-item"><span class="predict-label">MS Tahmini</span><span class="predict-val">5 - 0</span></div>
+            </div>
+            <span class="h2h-title">Aralarındaki Son 5 Maç</span>
+            <table class="h2h-table">
+                <tr><td>25.02.26</td><td>NAJMA - NASSR</td><td>0 - 5</td><td><span class="goal-tag">5 Gol</span></td></tr>
+                <tr><td>12.09.25</td><td>NASSR - NAJMA</td><td>4 - 0</td><td><span class="goal-tag">4 Gol</span></td></tr>
+                <tr><td>05.04.25</td><td>NAJMA - NASSR</td><td>1 - 3</td><td><span class="goal-tag">4 Gol</span></td></tr>
+                <tr><td>20.11.24</td><td>NASSR - NAJMA</td><td>3 - 0</td><td><span class="goal-tag">3 Gol</span></td></tr>
+                <tr><td>15.02.24</td><td>NAJMA - NASSR</td><td>0 - 2</td><td><span class="goal-tag">2 Gol</span></td></tr>
+            </table>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-label">MS 1 (İç)</span><span class="val">%92</span></div>
+                <div class="stat-item"><span class="stat-label">1.5 Üst (İç)</span><span class="val">%83</span></div>
+            </div>
+            <div class="ai-verdict">Ligin en golcü ekibi ile deplasmanda kayıp olan ekibi karşı karşıya. Fark kaçınılmaz. <span class="banko-label">🎯 TAVSİYE: MS 1 & 3.5 ÜST</span></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggle(id) {
+        let el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+</script>
+
+</body>
+</html>
